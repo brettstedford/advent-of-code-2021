@@ -1,6 +1,5 @@
 from common import get_input_as_lines
 
-
 lines: list[str] = get_input_as_lines('day2')
 
 x = 0
