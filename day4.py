@@ -23,32 +23,46 @@ def parse_bingo_cards(input: list[str]):
 
     return cards
 
-def check_card(numbers: list[int], card: list[list[int]]):
+def check_card(numbers: list[int], card: list[list[(int, bool)]]):
     bingo = False
     
-    complete_card = []
+    complete_card: list[list[(int, bool)]] = []
 
-    # for _, current_num in enumerate(numbers):
-    #     for _, line in enumerate(card):
-    #         for _, number in enumerate(line):
+    for _, line in enumerate(card):
+        complete_line: list[(int,bool)] = []
 
+        for _, number in enumerate(line):
+            complete_line.append((number, number in numbers))
+
+        complete_card.append(complete_line)
     
-    return bingo
+    bingo = any(all(row[idx][1] for row in complete_card) for idx in range(0,4))
 
-def get_score(number: int, card: list[list[int]]):
-    return 0
+    if(bingo == False):
+        bingo = any(all(number[1] for number in line) for line in complete_card)
 
-def play_bingo(numbers:list[int], cards: list[list[list[int]]]):
+    return (bingo, complete_card)
+
+def get_score(number: int, card: list[list[(int, bool)]]):
+    flattened = list(filter(lambda item: item[1] == False, [item for sublist in card for item in sublist]))
+    unused = sum(list(map(lambda item: item[0], flattened)))
+    print(number, unused)
+    return number * unused
+
+def play_bingo(numbers:list[int], cards: list[list[list[(int, bool)]]]):
     called:list[int] = []
 
-    for _, current_num in enumerate(numbers):
+    for i, current_num in enumerate(numbers):
         called.append(current_num)
 
-        for _, card in enumerate(cards):
+        for j, card in enumerate(cards):
             bingo = check_card(called, card)
+            print(i, j, current_num)
 
-            if(bingo):
-                return get_score(current_num, card)
+            if(bingo[0]):
+                print(i, j)
+                print(bingo[1])
+                return get_score(current_num, bingo[1])
 
     return 0
 
